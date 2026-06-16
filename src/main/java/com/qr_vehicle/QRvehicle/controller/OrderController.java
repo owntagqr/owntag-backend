@@ -35,6 +35,11 @@ public class OrderController {
     service.delete(id);
     }
 
+    @GetMapping("/track/{phone}")
+    public List<Order> trackOrders(@PathVariable String phone) {
+    return service.findByPhone(phone);
+    }
+
     @PutMapping("/{id}/status")
     public Order updateStatus(@PathVariable Long id, @RequestParam String status) {
 

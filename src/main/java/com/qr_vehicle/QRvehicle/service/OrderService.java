@@ -33,7 +33,11 @@ public class OrderService {
 
     public Page<Order> getPaginated(int page, int size) {
     return repo.findAll(PageRequest.of(page, size));
-}
+    }
+
+    public List<Order> findByPhone(String phone) {
+    return repo.findByPhone(phone);
+    }
 
     public void delete(Long id) {
     repo.deleteById(id);
