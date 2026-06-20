@@ -144,7 +144,10 @@ public class VehicleController {
     v.setOwnerName(updated.getOwnerName());
     v.setPhoneNumber(updated.getPhoneNumber());
     v.setVehicleNumber(updated.getVehicleNumber());
+     v.setAddress(updated.getAddress());
 
     return vehicleService.save(v);
     }
 }
+
+
