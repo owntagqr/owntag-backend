@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.qr_vehicle.QRvehicle.entity.VehicleOwner;
 
 public interface VehicleRepository extends JpaRepository<VehicleOwner, Long> {
+    // Optional<VehicleOwner> findByUniqueCode(String uniqueCode);
     Optional<VehicleOwner> findByUniqueCode(String uniqueCode);
 
 

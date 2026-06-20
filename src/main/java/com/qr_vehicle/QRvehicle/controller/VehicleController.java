@@ -45,9 +45,20 @@ public class VehicleController {
         return vehicleService.save(v);
     }
 
+    // @GetMapping("/vehicle/{code}")
+    // public VehicleOwner get(@PathVariable String code) {
+    //     return vehicleService.getByCode(code);
+    // }
+
     @GetMapping("/vehicle/{code}")
-    public VehicleOwner get(@PathVariable String code) {
-        return vehicleService.getByCode(code);
+    public ResponseEntity<VehicleOwner> get(@PathVariable String code) {
+
+    VehicleOwner v = vehicleService.getByCode(code);
+
+    return ResponseEntity.ok()
+            .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+            .header("Pragma", "no-cache")
+            .body(v);
     }
 
     @GetMapping("/all")

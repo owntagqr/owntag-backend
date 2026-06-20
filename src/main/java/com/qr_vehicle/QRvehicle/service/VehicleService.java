@@ -20,9 +20,14 @@ public class VehicleService {
     }
 
     public VehicleOwner save(VehicleOwner v) {
+
+    // ✅ ONLY generate code for NEW record
+    if (v.getUniqueCode() == null || v.getUniqueCode().isEmpty()) {
         v.setUniqueCode(UUID.randomUUID().toString());
-        return repo.save(v);
     }
+
+    return repo.save(v);
+}
 
     public VehicleOwner getByCode(String code) {
         return repo.findByUniqueCode(code).orElseThrow();
