@@ -34,6 +34,7 @@ import com.qr_vehicle.QRvehicle.util.TagPdfGenerator;
 origins = {
     "https://owntag.in",
     "https://www.owntag.in"
+    // "http://localhost:3000"
 },
 allowCredentials = "true"
 )
