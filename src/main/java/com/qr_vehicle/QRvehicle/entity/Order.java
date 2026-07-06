@@ -26,15 +26,9 @@ public class Order {
     )
     private String phone;
 
-    @NotBlank(message = "Emergency contact name is required")
-    @Size(min = 3, max = 100)
     private String emergencyName;
 
-    @NotBlank(message = "Emergency contact number is required")
-    @Pattern(
-        regexp = "^[6-9][0-9]{9}$",
-        message = "Enter valid emergency contact number"
-    )
+
     private String emergencyPhone;
 
     @NotBlank(message = "Address is required")
