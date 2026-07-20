@@ -23,16 +23,16 @@ public class TagBatchService {
     private final TagSheetService tagSheetService;
 
     public TagBatchService(
-        TagBatchRepository batchRepository,
-        TagInventoryRepository tagInventoryRepository,
-        TagInventoryService inventoryService,
-        TagSheetService tagSheetService) {
+            TagBatchRepository batchRepository,
+            TagInventoryRepository tagInventoryRepository,
+            TagInventoryService inventoryService,
+            TagSheetService tagSheetService) {
 
-    this.batchRepository = batchRepository;
-    this.tagInventoryRepository = tagInventoryRepository;
-    this.inventoryService = inventoryService;
-    this.tagSheetService = tagSheetService;
-}
+        this.batchRepository = batchRepository;
+        this.tagInventoryRepository = tagInventoryRepository;
+        this.inventoryService = inventoryService;
+        this.tagSheetService = tagSheetService;
+    }
 
     public TagBatch save(TagBatch batch) {
         return batchRepository.save(batch);
@@ -56,121 +56,179 @@ public class TagBatchService {
 
     public byte[] generateSheetPdf(String sheetCode) throws Exception {
 
-    List<TagInventory> tags =
-            tagInventoryRepository.findBySheetCode(sheetCode);
+        System.out.println("Loading Sheet : " + sheetCode);
 
-    return StickerSheetGenerator.generate(tags);
-}
+        List<TagInventory> tags =
+                tagInventoryRepository.findBySheetCode(sheetCode);
 
-    public byte[] generateBatchPdf(String batchCode)
-        throws Exception {
+        System.out.println("Tags Found : " + tags.size());
 
-    List<TagInventory> inventory = tagInventoryRepository.findByBatchCode(batchCode);
-                    
+        return StickerSheetGenerator.generate(tags);
+    }
 
-    return StickerSheetGenerator.generate(inventory);
+    
 
+    public byte[] generateBatchPdf(String batchCode) throws Exception {
+
+        System.out.println("Loading Batch : " + batchCode);
+
+        List<TagInventory> inventory =
+                tagInventoryRepository.findByBatchCode(batchCode);
+
+        System.out.println("Inventory Found : " + inventory.size());
+
+        return StickerSheetGenerator.generate(inventory);
     }
 
     @Transactional
-public TagBatch generateBatch(String stickerType, Integer vehicleCount) {
+    public TagBatch generateBatch(String stickerType, Integer vehicleCount) {
 
-    final int VEHICLES_PER_SHEET = 10;
+        System.out.println("==================================");
+        System.out.println("START GENERATE BATCH");
+        System.out.println("Sticker Type : " + stickerType);
+        System.out.println("Vehicle Count : " + vehicleCount);
 
-    long totalBatch = batchRepository.count() + 1;
+        final int VEHICLES_PER_SHEET = 10;
 
-    String batchCode = BatchCodeGenerator.generate(
-            stickerType,
-            totalBatch
-    );
+        long totalBatch = batchRepository.count() + 1;
 
-    TagBatch batch = new TagBatch();
+        System.out.println("Existing Batch Count : " + (totalBatch - 1));
 
-    batch.setBatchCode(batchCode);
-    batch.setStickerType(stickerType);
-    batch.setVehiclesCount(vehicleCount);
-    batch.setStickersCount(vehicleCount * 2);
-    batch.setPrinted(false);
+        String batchCode =
+                BatchCodeGenerator.generate(
+                        stickerType,
+                        totalBatch);
 
-    batch = batchRepository.save(batch);
+        System.out.println("Generated Batch Code : " + batchCode);
 
-    int totalSheets =
-            (int) Math.ceil((double) vehicleCount / VEHICLES_PER_SHEET);
+        TagBatch batch = new TagBatch();
 
-    int remainingVehicles = vehicleCount;
+        batch.setBatchCode(batchCode);
+        batch.setStickerType(stickerType);
+        batch.setVehiclesCount(vehicleCount);
+        batch.setStickersCount(vehicleCount * 2);
+        batch.setPrinted(false);
 
-    for (int sheet = 1; sheet <= totalSheets; sheet++) {
+        batch = batchRepository.save(batch);
 
-        int vehiclesThisSheet =
-                Math.min(remainingVehicles, VEHICLES_PER_SHEET);
+        System.out.println("Batch Saved");
 
-        String sheetCode =
-                batchCode + "-S" + String.format("%02d", sheet);
+        int totalSheets =
+                (int) Math.ceil((double) vehicleCount / VEHICLES_PER_SHEET);
 
-        TagSheet tagSheet = new TagSheet();
+        System.out.println("Total Sheets : " + totalSheets);
 
-        tagSheet.setBatchCode(batchCode);
-        tagSheet.setSheetCode(sheetCode);
-        tagSheet.setSheetNumber(sheet);
-        tagSheet.setVehiclesCount(vehiclesThisSheet);
-        tagSheet.setStickersCount(vehiclesThisSheet * 2);
+        int remainingVehicles = vehicleCount;
 
-        tagSheetService.save(tagSheet);
+        for (int sheet = 1; sheet <= totalSheets; sheet++) {
 
-        generateSheetInventory(
-                batchCode,
-                sheetCode,
-                sheet,
-                stickerType,
-                vehiclesThisSheet
-        );
+            System.out.println("--------------------------------");
 
-        remainingVehicles -= vehiclesThisSheet;
+            System.out.println("Creating Sheet : " + sheet);
+
+            int vehiclesThisSheet =
+                    Math.min(
+                            remainingVehicles,
+                            VEHICLES_PER_SHEET);
+
+            System.out.println("Vehicles In Sheet : " + vehiclesThisSheet);
+
+            String sheetCode =
+                    batchCode + "-S" + String.format("%02d", sheet);
+
+            System.out.println("Sheet Code : " + sheetCode);
+
+            TagSheet tagSheet = new TagSheet();
+
+            tagSheet.setBatchCode(batchCode);
+            tagSheet.setSheetCode(sheetCode);
+            tagSheet.setSheetNumber(sheet);
+            tagSheet.setVehiclesCount(vehiclesThisSheet);
+            tagSheet.setStickersCount(vehiclesThisSheet * 2);
+
+            tagSheetService.save(tagSheet);
+
+            System.out.println("Sheet Saved");
+
+            generateSheetInventory(
+                    batchCode,
+                    sheetCode,
+                    sheet,
+                    stickerType,
+                    vehiclesThisSheet);
+
+            remainingVehicles -= vehiclesThisSheet;
+
+            System.out.println("Remaining Vehicles : " + remainingVehicles);
+        }
+
+        System.out.println("BATCH COMPLETED");
+        System.out.println("==================================");
+
+        return batch;
     }
 
-    return batch;
-}
-private void generateSheetInventory(
-        String batchCode,
-        String sheetCode,
-        int sheetNumber,
-        String stickerType,
-        int vehicles) {
+    private void generateSheetInventory(
+            String batchCode,
+            String sheetCode,
+            int sheetNumber,
+            String stickerType,
+            int vehicles) {
 
-    int pair = 1;
+        System.out.println("Generating Inventory");
 
-    for (int row = 1; row <= 5; row++) {
+        int pair = 1;
 
-        for (int col = 1; col <= 4; col += 2) {
+        for (int row = 1; row <= 5; row++) {
 
-            if (pair > vehicles)
-                return;
+            for (int col = 1; col <= 4; col += 2) {
 
-            TagInventory inventory = new TagInventory();
+                if (pair > vehicles) {
 
-            inventory.setBatchCode(batchCode);
-            inventory.setSheetCode(sheetCode);
-            inventory.setSheetNumber(sheetNumber);
+                    System.out.println("Inventory Completed");
 
-            inventory.setStickerType(stickerType);
+                    return;
+                }
 
-            inventory.setTagId(
-                    inventoryService.generateRandomTagId());
+                System.out.println("----------------------");
+                System.out.println("Pair : " + pair);
+                System.out.println("Row : " + row);
+                System.out.println("Column : " + col);
 
-            inventory.setUniqueCode(
-                    inventoryService.generateUniqueCode());
+                TagInventory inventory = new TagInventory();
 
-            inventory.setAssigned(false);
+                inventory.setBatchCode(batchCode);
+                inventory.setSheetCode(sheetCode);
+                inventory.setSheetNumber(sheetNumber);
 
-            inventory.setSheetRow(row);
-            inventory.setSheetColumn(col);
-            inventory.setPairIndex(pair);
+                inventory.setStickerType(stickerType);
 
-            inventoryService.save(inventory);
+                String tagId =
+                        inventoryService.generateRandomTagId();
 
-            pair++;
+                System.out.println("Generated Tag ID : " + tagId);
+
+                inventory.setTagId(tagId);
+
+                String uniqueCode =
+                        inventoryService.generateUniqueCode();
+
+                System.out.println("Generated UUID : " + uniqueCode);
+
+                inventory.setUniqueCode(uniqueCode);
+
+                inventory.setAssigned(false);
+
+                inventory.setSheetRow(row);
+                inventory.setSheetColumn(col);
+                inventory.setPairIndex(pair);
+
+                inventoryService.save(inventory);
+
+                System.out.println("Inventory Saved");
+
+                pair++;
+            }
         }
     }
-}
-
 }

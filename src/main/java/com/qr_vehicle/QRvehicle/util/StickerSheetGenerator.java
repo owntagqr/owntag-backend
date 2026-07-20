@@ -1,17 +1,13 @@
 package com.qr_vehicle.QRvehicle.util;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
-import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Image;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.qr_vehicle.QRvehicle.entity.TagInventory;
 
 public class StickerSheetGenerator {
@@ -28,65 +24,46 @@ public class StickerSheetGenerator {
 
         PdfDocument pdf = new PdfDocument(writer);
 
-        pdf.setDefaultPageSize(
-                new PageSize(
-                        cm(40),
-                        cm(30)));
+        pdf.setDefaultPageSize(new PageSize(cm(40), cm(30)));
 
-        Document document = new Document(pdf);
+        pdf.addNewPage();
 
-        float gap = cm(0.2f);
+        PdfCanvas canvas = new PdfCanvas(pdf.getFirstPage());
 
-        float stickerWidth = cm(10) - gap;
-        float stickerHeight = cm(6) - gap;
+        float stickerWidth = cm(10);
+        float stickerHeight = cm(6);
 
         for (TagInventory inventory : inventoryList) {
 
-    BufferedImage sticker =
-            StickerImageGenerator.generate(
-        inventory.getUniqueCode(),
-        inventory.getTagId(),
-        inventory.getBatchCode(),
-        inventory.getSheetCode());
+            int row = inventory.getSheetRow() - 1;
 
-    ByteArrayOutputStream imageOut =
-            new ByteArrayOutputStream();
+            int firstColumn = inventory.getSheetColumn() - 1;
 
-    ImageIO.write(sticker, "png", imageOut);
+            for (int copy = 0; copy < 2; copy++) {
 
-    byte[] imageBytes = imageOut.toByteArray();
+                int currentColumn = firstColumn + copy;
 
-    int row = inventory.getSheetRow() - 1;
+                float x = currentColumn * stickerWidth;
 
-    int firstColumn = inventory.getSheetColumn() - 1;
+                float y = cm(30) - ((row + 1) * stickerHeight);
 
-    for (int copy = 0; copy < 2; copy++) {
+                Rectangle area = new Rectangle(
+                        x,
+                        y,
+                        stickerWidth,
+                        stickerHeight);
 
-        int currentColumn = firstColumn + copy;
+                StickerPdfRenderer.drawSticker(
+                        canvas,
+                        area,
+                        inventory.getUniqueCode(),
+                        inventory.getTagId(),
+                        inventory.getSheetCode());
+            }
+        }
 
-        Image img = new Image(
-                ImageDataFactory.create(imageBytes));
-
-        img.scaleAbsolute(
-                stickerWidth,
-                stickerHeight);
-
-        float x = currentColumn * cm(10);
-
-
-        float y = cm(30) - ((row + 1) * cm(6));
-
-        img.setFixedPosition(x, y);
-
-        document.add(img);
-    }
-
-}
-
-        document.close();
+        pdf.close();
 
         return baos.toByteArray();
-
     }
-
 }

@@ -53,18 +53,23 @@ public class TagInventoryService {
 
     public String generateRandomTagId() {
 
-        while (true) {
+    while (true) {
 
-            String tag = String.valueOf(
-                    10000000 + random.nextInt(90000000)
-            );
+        String tag = String.valueOf(
+                10000000 + random.nextInt(90000000));
 
-            if (repository.findByTagId(tag).isEmpty()) {
-                return tag;
-            }
+        System.out.println("Trying Tag ID : " + tag);
+
+        if (repository.findByTagId(tag).isEmpty()) {
+
+            System.out.println("Accepted Tag ID : " + tag);
+
+            return tag;
         }
 
+        System.out.println("Duplicate Tag ID, retrying...");
     }
+}
 
     public long totalTags() {
     return repository.count();
@@ -80,9 +85,14 @@ public class TagInventoryService {
 
     public String generateUniqueCode() {
 
-        return UUID.randomUUID().toString();
+    String uuid = UUID.randomUUID().toString();
 
-    }
+    System.out.println("Generated UUID : " + uuid);
+
+    return uuid;
+}
+
+    
     @Transactional
     public VehicleOwner assignTag(AssignTagRequest request) {
 

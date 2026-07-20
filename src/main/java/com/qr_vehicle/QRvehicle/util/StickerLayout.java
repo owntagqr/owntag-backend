@@ -19,20 +19,17 @@ public class StickerLayout {
 
     // QR Position
     public static final int QR_X = 780;      // Move 8-10 px right
-    public static final int QR_Y = 190;      // Move 8-10 px down
+    public static final int QR_Y = 170;      // Move 8-10 px down
     public static final int QR_SIZE = 345;   // Increase from ~295 to 320
 
     
-
-      
-
     // Tag ID Position (centered under QR)
    // Tag ID
     public static final int TAG_ID_X = 830;
     public static final int TAG_ID_Y = 650;  // Move below "owntag.in"
 
-// Batch Code (optional)
-    public static final int BATCH_X = 40;
-    public static final int BATCH_Y = 690;
+// // Batch Code (optional)
+//     public static final int BATCH_X = 40;
+//     public static final int BATCH_Y = 690;
 
 }
