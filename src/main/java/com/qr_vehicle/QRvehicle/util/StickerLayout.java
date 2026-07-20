@@ -18,7 +18,7 @@ public class StickerLayout {
     public static final float PAGE_HEIGHT_CM = 30f;
 
     // QR Position
-    public static final int QR_X = 780;      // Move 8-10 px right
+    public static final int QR_X = 750;      // Move 8-10 px right
     public static final int QR_Y = 170;      // Move 8-10 px down
     public static final int QR_SIZE = 345;   // Increase from ~295 to 320
 

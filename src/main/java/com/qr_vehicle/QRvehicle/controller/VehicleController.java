@@ -32,8 +32,8 @@ import com.qr_vehicle.QRvehicle.util.TagPdfGenerator;
 @RequestMapping("/api")
 @CrossOrigin(
 origins = {
-    "http://localhost:3000",
-    "http://localhost:5173",
+    // "http://localhost:3000",
+    // "http://localhost:5173",
     "https://owntag.in",
     "https://www.owntag.in"
 },
@@ -58,8 +58,8 @@ public class VehicleController {
     @GetMapping("/tag-pdf/{code}")
     public ResponseEntity<byte[]> getTagPdf(@PathVariable String code) throws Exception {
 
-    // String url = "https://owntag.in/v/" + code;
-    String url = "http://localhost:3000/v/" + code;
+    String url = "https://owntag.in/v/" + code;
+    // String url = "http://localhost:3000/v/" + code;
     byte[] qr = QRGenerator.generateQR(url);
 
     byte[] pdf = TagPdfGenerator.generateTag(qr);
@@ -154,8 +154,8 @@ public class VehicleController {
     @GetMapping("/qr/{code}")
     public ResponseEntity<byte[]> getQR(@PathVariable String code) throws Exception {
 
-        // String url = "https://owntag.in/v/" + code;
-        String url = "http://localhost:3000/v/" + code;
+        String url = "https://owntag.in/v/" + code;
+        // String url = "http://localhost:3000/v/" + code;
         byte[] qr = QRGenerator.generateQR(url);
 
         return ResponseEntity.ok()

@@ -14,7 +14,7 @@ import com.qr_vehicle.QRvehicle.service.OrderService;
     origins = {
         "https://owntag.in",
         "https://www.owntag.in",
-        "http://localhost:3000"
+        // "http://localhost:3000"
     },
     allowCredentials = "true"
 )

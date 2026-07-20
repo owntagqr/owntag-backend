@@ -12,8 +12,8 @@ import com.qr_vehicle.QRvehicle.service.TagInventoryService;
 @RestController
 @RequestMapping("/api/tag-inventory")
 @CrossOrigin(origins = {
-    "http://localhost:3000",
-    "http://localhost:5173",
+    // "http://localhost:3000",
+    // "http://localhost:5173",
     "https://owntag.in",
     "https://www.owntag.in"
 })
